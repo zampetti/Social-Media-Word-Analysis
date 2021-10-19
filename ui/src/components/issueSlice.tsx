@@ -2,22 +2,24 @@ import { createSlice } from '@reduxjs/toolkit';
 
 // The initial state of the issue component
 export const initialState = {
+  query: '',
   data: [],
   loading: false,
   error: false,
 };
 
 export const slice = createSlice({
-  name: 'issueWordAnalysis',
+  name: 'FETCH',
   initialState,
   reducers: {
-    fetchData(state) {
+    fetchData(state, action) {
+      console.log("FETCH DATA ACTION TYPE: ", action.type)
+      state.query = action.payload
       state.loading = true;
       state.error = false;
       state.data = [];
     },
     fetchSuccess(state, action) {
-        console.log("REDUCER PAYLOAD: ", action.payload)
       state.data = action.payload;
       state.loading = false;
     },
@@ -29,5 +31,7 @@ export const slice = createSlice({
 });
 
 export const { fetchData, fetchSuccess, fetchFailure } = slice.actions;
+export const selectQuery = (state:any) => state.issue.query
 export const selectFetch = (state:any) => state.issue.data
+export const selectLoad = (state:any) => state.issue.loading
 export default slice.reducer;

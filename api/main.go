@@ -17,7 +17,7 @@ func main() {
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/", twitter.HomeLink)
 	router.HandleFunc("/twitter", twitter.Twitter).Methods("GET", "OPTIONS")
-	// router.HandleFunc("/products", inventory.CreateProduct).Methods("POST", "OPTIONS")
+	router.HandleFunc("/twitter", twitter.Twitter).Methods("POST", "OPTIONS")
 	// router.HandleFunc("/products", inventory.UpdateProduct).Methods("PUT", "OPTIONS")
 
 	c := cors.New(cors.Options{

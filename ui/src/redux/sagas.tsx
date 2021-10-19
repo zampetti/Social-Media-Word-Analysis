@@ -1,6 +1,7 @@
-import { all, takeEvery, put } from "redux-saga/effects";
+import { all, call, takeEvery, put } from "redux-saga/effects";
 import {fetchSuccess, fetchFailure} from "../components/issueSlice";
 import { sagaActions } from "./sagaActions";
+import { selectQuery } from '../components/issueSlice'
 
 type wordCount = {
     Word: string
@@ -19,8 +20,18 @@ type IssueSagaReturn = {
 }
 export function* fetchDataSaga() {
     try {
-        let result:IssueSagaReturn = yield fetch("http://localhost:3000/twitter")
-            .then(response => response.json() );
+        // let result:IssueSagaReturn = yield fetch("http://localhost:3000/twitter")
+        //     .then(response => response.json() );
+
+        console.log('QUERY STRING: ', selectQuery)
+
+        let result: IssueSagaReturn = yield fetch("http://localhost:3000/twitter", {
+            method: 'POST',
+            body: JSON.stringify({
+                query: 'immigration'
+            })
+        })
+        .then(response => response.json())
         // console.log("SAGA RESPONSE: ", result)
         yield put(fetchSuccess(result));
     } catch (e) {
@@ -30,7 +41,7 @@ export function* fetchDataSaga() {
 }
 
 function* fetchWatcher() {
-    yield takeEvery(sagaActions.FETCH_DATA_SAGA, fetchDataSaga)
+    yield takeEvery(sagaActions.FETCH_DATA, fetchDataSaga)
 }
 
 // single entry point to start all Sagas at once

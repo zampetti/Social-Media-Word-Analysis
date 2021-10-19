@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
-  decrement,
-  increment,
+  // decrement,
+  // increment,
   incrementByAmount,
   selectCount,
 } from './counterSlice';
@@ -11,11 +11,11 @@ import styles from './Counter.scss';
 export default function Counter() {
   const count = useSelector(selectCount);
   const dispatch = useDispatch();
-  const [incrementAmount, setIncrementAmount] = useState('2');
+  const [incrementAmount, setIncrementAmount] = useState('immigration');
 
   return (
     <div>
-      <div className={styles.row}>
+      {/* <div className={styles.row}>
         <button
           className={styles.button}
           aria-label="Increment value"
@@ -31,11 +31,11 @@ export default function Counter() {
         >
           -
         </button>
-      </div>
+      </div> */}
       <div className={styles.row}>
         <input
           className={styles.textbox}
-          aria-label="Set increment amount"
+          aria-label="Type new issue"
           value={incrementAmount}
           onChange={e => setIncrementAmount(e.target.value)}
         />
@@ -45,7 +45,7 @@ export default function Counter() {
             dispatch(incrementByAmount(Number(incrementAmount) || 0))
           }
         >
-          Add Amount
+          Add Issue
         </button>
       </div>
     </div>

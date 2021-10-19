@@ -1,6 +1,29 @@
 .body {
     width: 33%;
-    height: 50px;
     border: 2px solid black;
     margin: 2% auto;
+    padding: 2%;
+
+    .__react_component_tooltip.show {
+        opacity: 1 !important;
+      }
+
+    .tipEffect {
+        width: 300px;
+        height: 200px;
+        overflow: scroll;
+        background: rgb(167, 198, 218);
+        opacity: 1;
+        color: black;
+        border: 2px solid black;
+        border-radius: 5px;
+        transition-property: height;
+        transition-duration: 1s;
+        // transition-delay: 0.2s;
+    }
+
+    .tipEffect:hover {
+        // width: 400px;
+        height: 300px;
+      }
 }

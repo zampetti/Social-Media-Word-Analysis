@@ -24,8 +24,8 @@ func stringInSlice(a string, list []string) bool {
 }
 
 type wc struct {
-	Word  string
-	Count int
+	Text  string `json:"text"`
+	Value int    `json:"value"`
 }
 
 type nc struct {
@@ -36,10 +36,12 @@ type nc struct {
 func wordCount(str string) []wc {
 	wordList := strings.Fields(str)
 	counts := make(map[string]int)
-	stopWords := []string{"A", "ABOUT", "ACTUALLY", "ALMOST", "ALSO", "ALTHOUGH", "ALWAYS", "AM", "AN", "AND", "ANY", "ARE", "AS", "AT", "BE",
+	stopWords := []string{"&AMP;", "A", "ABOUT", "ACTUALLY", "ALMOST", "ALSO", "ALTHOUGH", "ALWAYS", "AM", "AN", "AND", "ANY", "ARE", "AS", "AT",
+		"BE",
 		"BECAME", "BECOME", "BUT", "BY", "CAN", "COULD", "DID", "DO", "DOES", "EACH", "EITHER", "ELSE", "FOR", "FROM", "GET", "GOT", "HAD", "HAS",
 		"HAVE", "HENCE", "HOW", "I", "IF", "IN", "IS", "IT", "ITS", "JUST", "LIKE", "MAY", "MAYBE", "ME", "MIGHT", "MINE", "MUST", "MY", "MINE",
-		"MUST", "MY", "NEITHER", "NOR", "NOT", "OF", "OH", "OK", "OR", "SO", "THAT", "THE", "TO", "THEN", "THEY", "THIS", "THOSE", "WAS",
+		"MUST", "MY", "NEITHER", "NOR", "NOT", "OF", "OH", "OK", "ON", "OR", "SO", "THAT", "THE", "TO", "THEN", "THERE", "THEY", "THIS", "THOSE",
+		"WAS",
 		"WERE", "WHAT",
 		"WHEN", "WHERE",
 		"WHEREAS", "WHEREVER", "WHENEVER", "WHETHER", "WHICH", "WHILE", "WHO", "WHOM", "WHOEVER", "WHOSE", "WHY", "WILL", "WITH", "WITHIN",
@@ -61,7 +63,7 @@ func wordCount(str string) []wc {
 	}
 
 	sort.Slice(ss, func(i, j int) bool {
-		return ss[i].Count > ss[j].Count
+		return ss[i].Value > ss[j].Value
 	})
 
 	if len(ss) > 50 {
@@ -142,36 +144,50 @@ func getTweet(url string) (t structs.TwitterData) {
 	return twitter
 }
 
+type Request struct {
+	Query string `json:"query,omitempty"`
+}
+
 func Twitter(w http.ResponseWriter, r *http.Request) {
+
+	var newRequest Request
+	reqBody, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		fmt.Fprintf(w, "Enter product data")
+	}
+
+	json.Unmarshal(reqBody, &newRequest)
+
+	fmt.Println("NEW REQUEST IN API: ", newRequest)
 
 	var allResponses []structs.TwitterData
 
-	t := getTweet("https://api.twitter.com/2/tweets/search/recent?query=puppies&max_results=100")
+	t := getTweet("https://api.twitter.com/2/tweets/search/recent?query=" + newRequest.Query + "&max_results=100")
 
 	allResponses = append(allResponses, t)
 
 	if len(t.Meta.NextToken) > 0 {
-		fmt.Println("NEXT TOKEN t FOUND", t.Meta.NextToken)
+		// fmt.Println("NEXT TOKEN t FOUND", t.Meta.NextToken)
 		tw := getTweet("https://api.twitter.com/2/tweets/search/recent?query=puppies&next_token=" + t.Meta.NextToken)
 		allResponses = append(allResponses, tw)
 
 		if len(tw.Meta.NextToken) > 0 {
-			fmt.Println("NEXT TOKEN tw FOUND", tw.Meta.NextToken)
+			// fmt.Println("NEXT TOKEN tw FOUND", tw.Meta.NextToken)
 			twe := getTweet("https://api.twitter.com/2/tweets/search/recent?query=puppies&next_token=" + tw.Meta.NextToken)
 			allResponses = append(allResponses, twe)
 
 			if len(twe.Meta.NextToken) > 0 {
-				fmt.Println("NEXT TOKEN twe FOUND", twe.Meta.NextToken)
+				// fmt.Println("NEXT TOKEN twe FOUND", twe.Meta.NextToken)
 				twee := getTweet("https://api.twitter.com/2/tweets/search/recent?query=puppies&next_token=" + twe.Meta.NextToken)
 				allResponses = append(allResponses, twee)
 
 				if len(twee.Meta.NextToken) > 0 {
-					fmt.Println("NEXT TOKEN twee FOUND", twee.Meta.NextToken)
+					// fmt.Println("NEXT TOKEN twee FOUND", twee.Meta.NextToken)
 					tweet := getTweet("https://api.twitter.com/2/tweets/search/recent?query=puppies&next_token=" + twee.Meta.NextToken)
 					allResponses = append(allResponses, tweet)
 
 					if len(tweet.Meta.NextToken) > 0 {
-						fmt.Println("NEXT TOKEN tweet FOUND", tweet.Meta.NextToken)
+						// fmt.Println("NEXT TOKEN tweet FOUND", tweet.Meta.NextToken)
 						tweetDone := getTweet("https://api.twitter.com/2/tweets/search/recent?query=puppies&next_token=" + tweet.Meta.NextToken)
 						allResponses = append(allResponses, tweetDone)
 					}
@@ -189,14 +205,8 @@ func Twitter(w http.ResponseWriter, r *http.Request) {
 	}
 
 	strLine := strings.Join(tweetText, ",")
-	// for index, element := range wordCount(strLine) {
-	// 	fmt.Println(index, "=>", element)
-	// }
-
 	str := strings.ToLower(strLine)
 	parts := SplitOnNonLetters(str)
-	// fmt.Println("BIGRAMS: ", ngrams(parts, 2))
-	// fmt.Println("TRIGRAMS: ", ngrams(parts, 3))
 
 	type WordResults struct {
 		WordCount []wc
